@@ -111,7 +111,8 @@
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const KEY = urlParams.get('key');
-const API = '/api/products';
+const BACKEND_URL = "https://indiani-way-e-commerce.vercel.app";
+const API = `${BACKEND_URL}/api/products`;
 const toast = document.getElementById('toast');
 const saveBtn = document.getElementById('saveBtn');
 
@@ -128,7 +129,7 @@ async function load(){
  const res = await fetch(API); const data = await res.json();
  document.getElementById('list').innerHTML='';
  data.forEach(p=>{
-  document.getElementById('list').innerHTML+=`<div class="p-card"><img src="/uploads/${p.image}" onerror="this.src='https://via.placeholder.com/300'"><h4>${p.name}</h4><p>${p.category} | ₹${p.discountedPrice || p.price} ${p.discountedPrice?`<s style='opacity:.6'>₹${p.price}</s>`:''}</p><p style='font-size:12px;opacity:.7'>${p.description||''}</p><button onclick="editProd('${p._id}')">EDIT</button> <button onclick="delProd('${p._id}')">DELETE</button></div>`;
+  document.getElementById('list').innerHTML+=`<div class="p-card"><img src="${p.image.includes('http') ? p.image : BACKEND_URL+'/uploads/'+p.image}" onerror="this.src='https://via.placeholder.com/300'"><h4>${p.name}</h4><p>${p.category} | ₹${p.discountedPrice || p.price} ${p.discountedPrice?`<s style='opacity:.6'>₹${p.price}</s>`:''}</p><p style='font-size:12px;opacity:.7'>${p.description||''}</p><button onclick="editProd('${p._id}')">EDIT</button> <button onclick="delProd('${p._id}')">DELETE</button></div>`;
  });
 }
 // ID se element pakadna sahi tarika hai
