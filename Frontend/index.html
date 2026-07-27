@@ -746,8 +746,9 @@
   </div>
 
   <script>
+const BACKEND_URL = "https://indiani-way-e-commerce.vercel.app";
 let products = [];
-fetch('/api/products') // localhost likhne ki zarurat nahi, ab same server se aayega
+fetch(`${BACKEND_URL}/api/products`)
  .then(r=>r.json())
  .then(data=>{
 
@@ -758,11 +759,11 @@ fetch('/api/products') // localhost likhne ki zarurat nahi, ab same server se aa
       _id: p._id,
       category: p.category,
       name: p.name,
-      price: p.discountedPrice || p.price, // agar discount hai to wahi dikhega
+      price: p.discountedPrice || p.price,
       originalPrice: p.price,
       discountedPrice: p.discountedPrice,
       description: p.description,
-      image: `/uploads/${p.image}`,
+      image: p.image.includes('http') ? p.image : `${BACKEND_URL}/uploads/${p.image}`,
       tag: p.category
     }));
     renderProducts(products);
