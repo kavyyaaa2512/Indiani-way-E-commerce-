@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Indiani Way</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #FDF6F0;
+            padding: 20px 5%
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            border-radius: 6px
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px
+        }
+
+        .grid {
+            grid-template-columns: 1fr 1fr;
+            display: grid;
+            gap: 10px
+        }
+
+        .btn {
+            background: #3D1F10;
+            color: #fff;
+            padding: 10px 18px;
+            border: none;
+            cursor: pointer
+        }
+
+        .p-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px
+        }
+
+        .p-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #fff
+        }
+
+        .p-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover
+        }
+
+        /* --- SIRF GESTURES KE LIYE ADD KIYA HAI, CSS SAME HAI --- */
+        .btn{transition: all 0.2s ease; }
+        .btn:hover{transform: scale(1.03); letter-spacing: 0.5px; opacity: 0.9;}
+        .btn:active{transform: scale(0.97);}
+        .p-card{transition: transform 0.2s ease;}
+        .p-card:hover{transform: translateY(-4px);}
+        #toast{
+            position: fixed; top: 20px; right: 20px;
+            background: #3D1F10; color: #fff;
+            padding: 12px 20px; border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 9999; font-size: 14px;
+        }
+        #toast.show{transform: translateX(0);}
+    </style>
+</head>
+<body>
+<h2>THE INDIANI WAY - ADMIN PANEL</h2>
+<p id="status" style="color:red">Checking key...</p>
+<div id="toast">Product Saved Successfully ✓</div>
+<div class="card">
+<h3 id="formTitle">Add Product</h3>
+<form id="form">
+<input type="hidden" id="editId">
+<div class="grid"><input id="name" placeholder="Product Name" required><input id="category" placeholder="Create Category or Select " required list="catList">
+<datalist id="catList">
+  <option value="ethnic wear">
+  <option value="cord set">
+  <option value="skirt">
+  <option value="kurti">
+  <option value="jacket">
+  <option value="stoles">
+  <option value="pants">
+  <option value="shirt">
+  <option value="frocks">
+</datalist></div>
+<div class="grid"><input id="price" type="number" placeholder="Original Price (eg 16400)" required><input id="discountedPrice" type="number" placeholder="Discounted Price (eg 12900) - optional"></div>
+<textarea id="description" placeholder="Describe your Product" rows="3"></textarea>
+<label style="display:flex; align-items:center; gap:8px; margin:10px 0;">
+  <input type="checkbox" id="isFeatured" style="width:auto;"> 
+  <span>⭐ Show on Home Page (Featured)</span> <!-- special products home page pr show krwane ke liye  -->
+</label>
+<p style="font-size:12px; opacity:.7">Image should be 300x300px & 250kb in size to upload</p>
+<input type="file" id="image" accept="image/*"><button class="btn" type="submit" id="saveBtn">SAVE</button><button type="button" id="cancel" style="display:none">Cancel Edit</button>
+</form></div>
+<div class="p-grid" id="list"></div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const KEY = urlParams.get('key');
+const BACKEND_URL = "https://indiani-way-e-commerce.vercel.app";
+const API = `${BACKEND_URL}/api/products`;
+const toast = document.getElementById('toast');
+const saveBtn = document.getElementById('saveBtn');
+
+function showToast(msg){
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 2500);
+}
+
+if(!KEY){ document.getElementById('status').innerText="Key missing! Link like this : admin.html?key=INDIANI@2025"; }
+else{ document.getElementById('status').innerText="Access Granted: "+KEY; document.getElementById('status').style.color='green'; }
+
+async function load(){
+ const res = await fetch(API); const data = await res.json();
+ document.getElementById('list').innerHTML='';
+ data.forEach(p=>{
+  document.getElementById('list').innerHTML+=`<div class="p-card"><img src="${p.image.includes('http') ? p.image : BACKEND_URL+'/uploads/'+p.image}" onerror="this.src='https://via.placeholder.com/300'"><h4>${p.name}</h4><p>${p.category} | ₹${p.discountedPrice || p.price} ${p.discountedPrice?`<s style='opacity:.6'>₹${p.price}</s>`:''}</p><p style='font-size:12px;opacity:.7'>${p.description||''}</p><button onclick="editProd('${p._id}')">EDIT</button> <button onclick="delProd('${p._id}')">DELETE</button></div>`;
+ });
+}
+// ID se element pakadna sahi tarika hai
+const nameInput = document.getElementById('name');
+const categoryInput = document.getElementById('category');
+const priceInput = document.getElementById('price');
+const discountedPriceInput = document.getElementById('discountedPrice');
+const descriptionInput = document.getElementById('description');
+const isFeaturedInput = document.getElementById('isFeatured');
+const imageInput = document.getElementById('image');
+const editIdInput = document.getElementById('editId');
+
+document.getElementById('form').addEventListener('submit', async e=>{
+ e.preventDefault();
+ saveBtn.innerText = "SAVING...";
+ saveBtn.disabled = true;
+
+ const fd = new FormData();
+ fd.append('name', nameInput.value);
+ fd.append('category', categoryInput.value);
+ fd.append('price', priceInput.value);
+ fd.append('discountedPrice', discountedPriceInput.value);
+ fd.append('description', descriptionInput.value);
+ fd.append('isFeatured', isFeaturedInput.checked);
+ if(imageInput.files[0]) fd.append('image', imageInput.files[0]);
+
+ const id = editIdInput.value;
+ const method = id?'PUT':'POST';
+ const url = id?`${API}/${id}?key=${KEY}`:`${API}?key=${KEY}`;
+
+ try{
+    const res = await fetch(url, {method, headers:{'x-admin-key':KEY}, body:fd});
+    const result = await res.json();
+    console.log("SERVER RESPONSE:", result); // isse pata chalega kya gaya
+    if(res.ok){
+        showToast(id? 'Product Updated Successfully ✓' : 'Product Saved Successfully ✓');
+        e.target.reset();
+        editIdInput.value='';
+        formTitle.innerText='Add Product';
+        cancel.style.display='none';
+        load();
+    } else {
+        showToast('Error: ' + (result.error || 'Save failed'));
+    }
+ } catch(err){
+    console.log(err);
+    showToast('Server Error!');
+ }
+
+ saveBtn.innerText = "SAVE";
+ saveBtn.disabled = false;
+});
+
+window.editProd = async(id)=>{
+ const res = await fetch(API);
+ const data = await res.json();
+ const p=data.find(x=>x._id===id);
+ if(!p) return alert("Product not found");
+ editIdInput.value=p._id;
+ nameInput.value=p.name;
+ categoryInput.value=p.category;
+ priceInput.value=p.price;
+ discountedPriceInput.value=p.discountedPrice||'';
+ descriptionInput.value=p.description||'';
+ formTitle.innerText='Edit: '+p.name;
+ cancel.style.display='inline';
+ window.scrollTo({top:0, behavior:'smooth'});
+}
+
+window.editProd = async(id)=>{
+ const res = await fetch(API); const data = await res.json(); const p=data.find(x=>x._id===id);
+ editId.value=p._id; name.value=p.name; category.value=p.category; price.value=p.price; discountedPrice.value=p.discountedPrice||''; description.value=p.description||'';
+ formTitle.innerText='Edit: '+p.name; cancel.style.display='inline'; window.scrollTo({top:0, behavior:'smooth'});
+}
+window.delProd = async(id)=>{ if(!confirm('Delete?'))return; await fetch(`${API}/${id}?key=${KEY}`,{method:'DELETE', headers:{'x-admin-key':KEY}}); showToast('Product Deleted'); load(); }
+document.getElementById('cancel').onclick=()=>{ form.reset(); editId.value=''; formTitle.innerText='Add Product'; cancel.style.display='none'; }
+load();
+</script>
+</body>
+</html>
