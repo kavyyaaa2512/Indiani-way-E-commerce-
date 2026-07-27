@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Indiani Way - Products</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{ --bg-main:#FDF6F0; --bg-card:#F9F0EA; --text-dark:#3D2116; --text-light:#8B6A5A; --white:#FFFBF7; --brown-dark:#3D1F10; --red-accent:#9B1C1C; }
+*{margin:0;padding:0;box-sizing:border-box;} html,body{width:100%; overflow-x:hidden;}
+body{font-family:'Inter', sans-serif;background:var(--bg-main);color:var(--text-dark);}
+.navbar{ display:flex; justify-content:space-between; align-items:center; padding:18px 5%; background:var(--white); border-bottom:1px solid #EAE0D8; position:sticky; top:0; z-index:100; width:100%; }
+.logo{font-family:'Cormorant Garamond', serif;letter-spacing:3px;font-size:19px;font-weight:500;cursor:pointer;}
+.nav-links{display:flex;gap:24px;list-style:none;font-size:11px;letter-spacing:2px; align-items:center;}
+.nav-links a{text-decoration:none;color:var(--text-dark);font-weight:500; position:relative; padding-bottom:3px;}
+.nav-links a.active::after, .nav-links a:hover::after{content:''; position:absolute; left:0; bottom:0; width:100%; height:1.5px; background:var(--red-accent);}
+.enquiry-count{ background:var(--red-accent); color:#fff; font-size:9px; padding:2px 6px; border-radius:10px; margin-left:4px; }
+.featured-header{padding:30px 5% 15px; display:flex; justify-content:space-between; align-items:end;}
+.main-heading{font-family:'Cormorant Garamond', serif; font-size: 42px; font-weight:400;}
+.categories{font-size:11px; letter-spacing:2px; opacity:0.6; text-transform:uppercase;}
+.filter-section{ padding:12px 5%; display:flex; gap:8px; border-bottom:1px solid #EAE0D8; border-top:1px solid #EAE0D8; background:var(--bg-main); position:sticky; top:58px; z-index:90; overflow-x:auto; white-space:nowrap; }
+.filter-section::-webkit-scrollbar{display:none;}
+.filter-btn{ flex-shrink:0; padding:7px 16px; border:1px solid var(--text-dark); background:transparent; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; }
+.filter-btn.active, .filter-btn:hover{background:var(--text-dark);color:var(--white);}
+.product-grid{ display:grid; width:100%; padding:20px 5%; gap:20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.product-card{background:var(--white);border:1px solid #EAE0D8; width:100%;}
+.image-wrap{background:var(--bg-card);position:relative;aspect-ratio:1/1.15;overflow:hidden;}
+.image-wrap img{width:100%;height:100%;object-fit:cover;}
+.wishlist-btn{ position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%; background:#fff;border:none;display:grid;place-items:center;cursor:pointer;font-size:16px; }
+.wishlist-btn.wished{background:var(--red-accent); color:#fff;}
+.product-info{padding:12px 10px;}
+.product-category{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:4px;}
+.product-name{font-family:'Cormorant Garamond', serif;font-size:17px;margin-bottom:4px;}
+.product-price{font-size:12px;font-weight:600;margin-bottom:10px;}
+.enquire-btn{width:100%;padding:8px;border:1px solid var(--text-dark);background:transparent;font-size:9px;letter-spacing:1.2px;cursor:pointer;}
+.enquire-btn:hover{background:var(--text-dark); color:var(--white);}
+.modal-overlay{position:fixed; inset:0; background:rgba(42,21,10,0.6); backdrop-filter:blur(8px); z-index:2000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:0.4s;}
+.modal-overlay.open{opacity:1; visibility:visible;}
+.modal{background:#FDF6F0; padding:32px; border-radius:4px; max-width:460px; width:90%; position:relative;}
+.modal-close{position:absolute; top:14px; right:14px; font-size:18px; background:none; border:none; cursor:pointer;}
+.modal-title{font-family:'Cormorant Garamond', serif; font-size:24px; text-align:center; margin-bottom:6px;}
+.modal-subtitle{font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--red-accent); text-align:center; margin-bottom:20px; font-weight:600;}
+.modal-form{display:flex; flex-direction:column; gap:12px;}
+.modal-form input, .modal-form textarea{padding:12px 14px; border:1px solid #EAE0D8; background:#fff; font-size:13px;}
+.modal-form button{background:var(--brown-dark); color:#fff; padding:14px; border:none; font-size:11px; letter-spacing:1.5px; cursor:pointer; text-transform:uppercase;}
+.enquiries-page{display:none; min-height:80vh; padding:30px 5%;}
+.enquiries-page.open{display:block;}
+.enquiry-item{background:#fff; border:1px solid #EAE0D8; padding:16px; display:flex; gap:16px; align-items:center; margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">THE INDIANI WAY</div>
+    <ul class="nav-links">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="product.html" class="active">PRODUCTS</a></li>
+        <li><a href="#" id="yourEnquiriesLink">YOUR ENQUIRIES <span id="enquiryCount" class="enquiry-count" style="display:none">0</span></a></li>
+    </ul>
+</nav>
+
+<div id="mainShop">
+    <div class="featured-header">
+        <div><h1 class="main-heading">Our Products</h1><p class="categories">Categories • Handcrafted in India</p></div>
+    </div>
+    <div class="filter-section" id="filterSection">
+        <button class="filter-btn active" data-filter="all">All</button>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+</div>
+
+<div id="enquiriesPage" class="enquiries-page">
+    <h1 class="main-heading" style="margin-bottom:20px">Your Enquiries</h1>
+    <div id="enquiriesList"></div>
+    <p id="emptyEnq" style="opacity:0.6; font-size:14px;">No enquiries yet.</p>
+</div>
+
+<div class="modal-overlay" id="enquireModal">
+    <div class="modal">
+        <button class="modal-close" id="modalClose">✕</button>
+        <h3 class="modal-title">Enquire About This Piece</h3>
+        <p class="modal-subtitle" id="modalProductName">Product Name</p>
+        <form class="modal-form" id="modalForm">
+            <input type="text" id="enqName" placeholder="Your Name" required />
+            <input type="tel" id="enqPhone" placeholder="Phone / WhatsApp" required />
+            <input type="email" id="enqEmail" placeholder="Email Address" />
+            <textarea id="enqMessage" rows="3" placeholder="Your message..."></textarea>
+            <button type="submit">SEND ENQUIRY</button>
+        </form>
+        <div class="modal-success" id="modalSuccess" style="display:none; text-align:center;">
+            <h3>Enquiry Saved!</h3>
+            <button onclick="closeModal()" style="margin-top:14px; padding:10px 20px; border:1px solid #3D2116; background:transparent; cursor:pointer;">CONTINUE SHOPPING</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let products = [];
+let wishlist = JSON.parse(localStorage.getItem('indiani_wishlist') || '[]');
+let enquiries = JSON.parse(localStorage.getItem('indiani_enquiries') || '[]');
+let currentEnquiryProduct = null;
+
+const grid = document.getElementById('productGrid');
+const filterSection = document.getElementById('filterSection');
+const modalOverlay = document.getElementById('enquireModal');
+const modalProductName = document.getElementById('modalProductName');
+const modalForm = document.getElementById('modalForm');
+const modalSuccess = document.getElementById('modalSuccess');
+
+fetch('/api/products')
+ .then(r=>r.json())
+ .then(data=>{
+    products = data.map(p=>({
+      id: p._id, _id: p._id, category: p.category, name: p.name,
+      price: p.discountedPrice || p.price, originalPrice: p.price, discountedPrice: p.discountedPrice,
+      description: p.description, image: `/uploads/${p.image}`, tag: p.category
+    }));
+    renderProducts(products);
+    renderCategoryFilters(products);
+  });
+
+function renderCategoryFilters(list){
+    const cats = [...new Set(list.map(p=>p.category.toLowerCase()))];
+    filterSection.innerHTML = `<button class="filter-btn active" data-filter="all">All</button>`;
+    cats.forEach(cat=>{
+        filterSection.innerHTML += `<button class="filter-btn" data-filter="${cat}">${cat}</button>`;
+    });
+    document.querySelectorAll('.filter-btn').forEach(btn=>{
+        btn.addEventListener('click', function(){
+            document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+            this.classList.add('active');
+            const f = this.getAttribute('data-filter');
+            if(f==='all') renderProducts(products); 
+            else renderProducts(products.filter(p=>p.category.toLowerCase()===f));
+        });
+    });
+}
+
+function renderProducts(list){
+    grid.innerHTML = "";
+    if(list.length===0){ grid.innerHTML="<p style='padding:20px'>No products</p>"; return; }
+    list.forEach(p => {
+        const isWished = wishlist.includes(p.id);
+        grid.innerHTML += `
+        <div class="product-card">
+            <div class="image-wrap">
+                <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300'">
+                <button class="wishlist-btn ${isWished ? 'wished' : ''}" data-id="${p.id}">${isWished ? '♥' : '♡'}</button>
+            </div>
+            <div class="product-info">
+                <p class="product-category">${p.category}</p>
+                <h3 class="product-name">${p.name}</h3>
+                <p class="product-price">₹${p.price} ${p.discountedPrice?`<s style='opacity:.5;font-size:10px'>₹${p.originalPrice}</s>`:''}</p>
+                <button class="enquire-btn" data-id="${p.id}" data-name="${p.name}">ENQUIRE</button>
+            </div>
+        </div>`;
+    });
+    attachCardEvents();
+}
+
+function attachCardEvents(){
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            const isWished = btn.classList.toggle('wished');
+            if(isWished){ if(!wishlist.includes(id)) wishlist.push(id); btn.textContent='♥'; }
+            else { wishlist = wishlist.filter(i => i !== id); btn.textContent='♡'; }
+            localStorage.setItem('indiani_wishlist', JSON.stringify(wishlist));
+        });
+    });
+    document.querySelectorAll('.enquire-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            currentEnquiryProduct = products.find(pr => pr.id === id);
+            modalProductName.textContent = btn.getAttribute('data-name');
+            modalForm.style.display='flex'; modalSuccess.style.display='none';
+            modalOverlay.classList.add('open');
+        });
+    });
+}
+
+function closeModal(){ modalOverlay.classList.remove('open'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e)=>{ if(e.target === modalOverlay) closeModal(); });
+
+modalForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const newEnq = { id: Date.now(), product: currentEnquiryProduct, name: document.getElementById('enqName').value, date: new Date().toLocaleString() };
+    enquiries.unshift(newEnq);
+    localStorage.setItem('indiani_enquiries', JSON.stringify(enquiries));
+    modalForm.style.display='none'; modalSuccess.style.display='block';
+    modalForm.reset();
+});
+</script>
+</body>
+</html>
