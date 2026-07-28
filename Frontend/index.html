@@ -751,10 +751,9 @@ let products = [];
 fetch(`${BACKEND_URL}/api/products`)
  .then(r=>r.json())
  .then(data=>{
-    console.log("API Response:", data); // ye check ke liye
-
-    // Agar backend error de raha hai to array nahi hoga
-    if (!Array.isArray(data)) {
+   console.log("API Response:", data);
+   
+   if (!Array.isArray(data)) {
         console.error("Backend error:", data);
         return;
     }
@@ -770,11 +769,11 @@ fetch(`${BACKEND_URL}/api/products`)
       originalPrice: p.price,
       discountedPrice: p.discountedPrice,
       description: p.description,
-      image: p.image && p.image.includes('http') ? p.image : `${BACKEND_URL}/uploads/${p.image}`,
+      image: p.image.includes('http') ? p.image : `${BACKEND_URL}/uploads/${p.image}`,
       tag: p.category
     }));
     renderProducts(products);
-  })
+  });
   .catch(err => console.error("Fetch failed:", err));
   </script>
 
