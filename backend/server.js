@@ -17,22 +17,39 @@ const ADMIN_KEY = process.env.ADMIN_KEY || "INDIANI@2025";
 app.use(cors());
 app.use(express.json());
 
-// CLOUDINARY CONFIG
+// CLOUDINARY CONFIG - TERA FEATURE SAME HAI
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// MongoDB Connect - FIXED CASE
+// MongoDB Connect - FIXED
 const MONGO_URI = process.env.ATLAS_URI || process.env.atlas_URI;
 console.log("URI check:", MONGO_URI ? "FOUND" : "MISSING");
 
-let isConnected = false;  async function connectDB() {   if (isConnected) return;   try {     await mongoose.connect(MONGO_URI, {       dbName: "indianway"     });     isConnected = true;     console.log("MongoDB Connected SUCCESS");   } catch (err) {     console.log("MongoDB Error:", err.message);   } }  // har route se pehle call kar app.use(async (req, res, next) => {   await connectDB();   next(); });
- .then(() => console.log("MongoDB Connected"))
- .catch(err => console.log("MongoDB Error:", err));
+let isConnected = false;
+async function connectDB() {
+  if (isConnected && mongoose.connection.readyState === 1) return;
+  try {
+    if (!MONGO_URI) return;
+    await mongoose.connect(MONGO_URI, {
+      dbName: "indianway"
+    });
+    isConnected = true;
+    console.log("MongoDB Connected SUCCESS");
+  } catch (err) {
+    console.log("MongoDB Error:", err.message);
+  }
+}
 
-// MULTER + CLOUDINARY SETUP
+// har route se pehle call - TERA FEATURE
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
+// MULTER + CLOUDINARY SETUP - TERA FEATURE SAME
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -43,15 +60,16 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-// Security Middleware
+// Security Middleware - TERA FEATURE SAME
 function checkAdmin(req, res, next){
   const key = req.headers['x-admin-key'] || req.query.key;
   if(key === ADMIN_KEY) next();
   else res.status(403).json({ message: "Access Denied" });
 }
 
-// APIs
+// APIs - SAARE SAME HAI
 app.get('/', (req,res) => res.send('Indiani Way Backend is Live!'));
+
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -73,7 +91,7 @@ app.post('/api/products', checkAdmin, upload.single('image'), async (req, res) =
       price: Number(price),
       discountedPrice: discountedPrice ? Number(discountedPrice) : null,
       description: description || "",
-      image: req.file ? req.file.path : 'no-image.jpg', // FIXED FOR CLOUDINARY
+      image: req.file ? req.file.path : 'no-image.jpg',
       isFeatured: isFeatured === 'true' || isFeatured === true
     });
     await newProduct.save();
@@ -106,7 +124,7 @@ app.delete('/api/products/:id', checkAdmin, async (req, res) => {
   res.json({ message: "Deleted" });
 });
 
-// VERCEL KE LIYE FIX
+// VERCEL KE LIYE FIX - TERA FEATURE SAME
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Backend: http://localhost:${PORT}`);
