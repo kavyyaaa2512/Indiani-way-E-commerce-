@@ -11,7 +11,7 @@ const Product = require('./models/product');
 const app = express();
 const ADMIN_KEY = process.env.ADMIN_KEY || "INDIANI@2025";
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 cloudinary.config({
