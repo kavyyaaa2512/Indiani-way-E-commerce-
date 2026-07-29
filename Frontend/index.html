@@ -746,15 +746,13 @@
   </div>
 
 <script>
-const BACKEND_URL = "https://indiani-way-e-commerce-ofht.vercel.app";
 let products = [];
-fetch(`${BACKEND_URL}/api/products`)
+fetch(`/api/products`)
  .then(r=>r.json())
  .then(data=>{
    console.log("API Response:", data);
    if (!Array.isArray(data)) { console.error("Backend error:", data); return; }
     
-    // Featured products home page pe
     const featuredOnly = data.filter(p => p.isFeatured === true);
     console.log("Featured:", featuredOnly);
 
@@ -767,14 +765,11 @@ fetch(`${BACKEND_URL}/api/products`)
       originalPrice: p.price,
       discountedPrice: p.discountedPrice,
       description: p.description,
-      image: p.image, // Cloudinary direct link
+      image: p.image,
       tag: p.category,
       isFeatured: p.isFeatured
     }));
-    // Agar home page pe sirf featured dikhana hai to:
     renderProducts(featuredOnly); 
-    // Agar saare dikhane hain to:
-    // renderProducts(products);
   })
   .catch(err => console.error("Fetch failed:", err));
 </script>
