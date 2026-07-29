@@ -28,7 +28,7 @@ cloudinary.config({
 const MONGO_URI = process.env.ATLAS_URI || process.env.atlas_URI;
 console.log("URI check:", MONGO_URI ? "FOUND" : "MISSING");
 
-mongoose.connect(MONGO_URI)
+let isConnected = false;  async function connectDB() {   if (isConnected) return;   try {     await mongoose.connect(MONGO_URI, {       dbName: "indianway"     });     isConnected = true;     console.log("MongoDB Connected SUCCESS");   } catch (err) {     console.log("MongoDB Error:", err.message);   } }  // har route se pehle call kar app.use(async (req, res, next) => {   await connectDB();   next(); });
  .then(() => console.log("MongoDB Connected"))
  .catch(err => console.log("MongoDB Error:", err));
 
