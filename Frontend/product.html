@@ -95,6 +95,7 @@ body{font-family:'Inter', sans-serif;background:var(--bg-main);color:var(--text-
 </div>
 
 <script>
+const BACKEND_URL = "https://indiani-way-e-commerce-ofht.vercel.app";
 let products = [];
 let wishlist = JSON.parse(localStorage.getItem('indiani_wishlist') || '[]');
 let enquiries = JSON.parse(localStorage.getItem('indiani_enquiries') || '[]');
@@ -107,18 +108,18 @@ const modalProductName = document.getElementById('modalProductName');
 const modalForm = document.getElementById('modalForm');
 const modalSuccess = document.getElementById('modalSuccess');
 
-fetch('/api/products')
+fetch(`${BACKEND_URL}/api/products`)
  .then(r=>r.json())
  .then(data=>{
     products = data.map(p=>({
       id: p._id, _id: p._id, category: p.category, name: p.name,
       price: p.discountedPrice || p.price, originalPrice: p.price, discountedPrice: p.discountedPrice,
-      description: p.description, image: `/uploads/${p.image}`, tag: p.category
+      description: p.description, image: p.image, tag: p.category, isFeatured: p.isFeatured
     }));
     renderProducts(products);
     renderCategoryFilters(products);
   });
-
+    
 function renderCategoryFilters(list){
     const cats = [...new Set(list.map(p=>p.category.toLowerCase()))];
     filterSection.innerHTML = `<button class="filter-btn active" data-filter="all">All</button>`;
