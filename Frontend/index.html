@@ -772,9 +772,9 @@ fetch(`${BACKEND_URL}/api/products`)
       isFeatured: p.isFeatured
     }));
     // Agar home page pe sirf featured dikhana hai to:
-    // renderProducts(featuredOnly); 
+    renderProducts(featuredOnly); 
     // Agar saare dikhane hain to:
-    renderProducts(products);
+    // renderProducts(products);
   })
   .catch(err => console.error("Fetch failed:", err));
 </script>
