@@ -91,7 +91,7 @@ app.delete('/api/products/:id', checkAdmin, async (req, res) => {
   res.json({ message: "Deleted" });
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(5000, () => console.log(`Backend: http://localhost:5000`));
+if (require.main === module) {
+  app.listen(process.env.PORT || 5000, () => console.log("Server running"));
 }
 module.exports = app;
